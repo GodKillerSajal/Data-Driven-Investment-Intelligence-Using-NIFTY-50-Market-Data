@@ -83,7 +83,7 @@ Commit and push the following files/folders to your GitHub repository:
 - `notebooks/04_Portfolio_Construction.ipynb`
 - `notebooks/05_Risk_Assessment.ipynb`
 - `notebooks/06_Explainability.ipynb`
-- `notebooks/07_Report_Generation.ipynb`
+
 
 ### 3. Scripts & Configuration (The Framework)
 - `data/download_data.py` - Kaggle downloader and parquet converter.
