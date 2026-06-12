@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIFTY-50 AI Investment Intelligence Prototype</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div>
+                <h1>NIFTY-50 Investment Intelligence</h1>
+                <p style="color: #9ca3af; font-size: 0.95rem; margin-top: 0.25rem;">AI-Driven Portfolio Optimization & Predictive Attributions Prototype</p>
+            </div>
+            <span class="badge" id="latest-date-badge">Data: Out-of-Sample</span>
+        </header>
+
+        <!-- Model Performance Cards (Deliverable 2 / Section 4 metrics) -->
+        <div class="grid-cols-4">
+            <div class="glass-panel metric-card">
+                <div class="metric-label">Model Type</div>
+                <div class="metric-value" style="color: #a78bfa;">LGBM Regressor</div>
+                <div class="metric-desc">Gradient Boosted Decision Trees</div>
+            </div>
+            <div class="glass-panel metric-card">
+                <div class="metric-label">Out-of-Sample MAE</div>
+                <div class="metric-value" id="metrics-mae">0.014577</div>
+                <div class="metric-desc">Mean Absolute Error (Daily Return)</div>
+            </div>
+            <div class="glass-panel metric-card">
+                <div class="metric-label">Out-of-Sample R²</div>
+                <div class="metric-value" id="metrics-r2">-0.004126</div>
+                <div class="metric-desc">Coefficient of Determination</div>
+            </div>
+            <div class="glass-panel metric-card">
+                <div class="metric-label">Directional Accuracy</div>
+                <div class="metric-value success-text" id="metrics-accuracy">50.17%</div>
+                <div class="metric-desc">Prediction Sign Accuracy (Out-of-Sample)</div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="grid-main">
+            <!-- Left Side: Interactive Chart -->
+            <div class="glass-panel" style="display: flex; flex-direction: column;">
+                <h3 style="margin-bottom: 1rem; font-weight: 700;">Interactive Backtest Simulation (2016-2021)</h3>
+                <div style="flex-grow: 1; min-height: 350px; position: relative;">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Side: Interactive Allocation Optimiser -->
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 1rem; font-weight: 700;">Portfolio Allocator</h3>
+                <p style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 1.25rem;">
+                    Select an investor profile or adjust the slider to recalculate backtest stats instantly in your browser (includes 0.1% rebalancing transaction cost).
+                </p>
+
+                <!-- Profile Buttons -->
+                <div class="profile-buttons">
+                    <button class="btn-profile" id="btn-conservative">Conservative</button>
+                    <button class="btn-profile" id="btn-balanced">Balanced</button>
+                    <button class="btn-profile active" id="btn-aggressive">Aggressive</button>
+                </div>
+
+                <!-- Custom Allocation Slider -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-title">Equity Allocation Weight</span>
+                        <span class="control-value" id="weight-equity-val">80%</span>
+                    </div>
+                    <input type="range" id="weight-equity-slider" min="0" max="100" value="80">
+                    <div class="control-header" style="margin-top: 0.5rem; font-size: 0.8rem; color: #6b7280;">
+                        <span>0% (100% Debt)</span>
+                        <span>100% (100% Equity)</span>
+                    </div>
+                </div>
+
+                <!-- Live Results -->
+                <h4 style="margin-bottom: 0.5rem; font-weight: 600; color: #e5e7eb;">Simulation Stats (Net of Fees)</h4>
+                <div class="backtest-results">
+                    <div class="result-row">
+                        <span class="result-label">Annualized Return (CAGR)</span>
+                        <span class="result-val success-text" id="sim-cagr">4.14%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Annualized Volatility</span>
+                        <span class="result-val" id="sim-vol">19.52%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Sharpe Ratio (Rf=5%)</span>
+                        <span class="result-val" id="sim-sharpe">-0.04</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Maximum Drawdown</span>
+                        <span class="result-val" style="color: #ef4444;" id="sim-drawdown">-42.42%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Stock Picks & Explainability -->
+        <div class="grid-main" style="margin-top: 1.5rem;">
+            <!-- Left Side: Stock Recommendations -->
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 0.5rem; font-weight: 700;">Model Stock Allocations</h3>
+                <p style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 1rem;" id="holdings-header">
+                    Top 10 recommended stock allocations selected for the next trading session.
+                </p>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Forecast Return</th>
+                                <th>Close Price</th>
+                                <th>RSI (14)</th>
+                                <th>Volatility (20d)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="holdings-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Right Side: Explainability Attributions -->
+            <div class="glass-panel">
+                <h3 style="margin-bottom: 0.5rem; font-weight: 700;">Model Attributions (SHAP)</h3>
+                <p style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 1rem;">
+                    Local attributions generated on stationary features via SHAP tree explainer.
+                </p>
+                <img src="shap_summary_plot.png" class="explain-img" alt="SHAP summary plot">
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
