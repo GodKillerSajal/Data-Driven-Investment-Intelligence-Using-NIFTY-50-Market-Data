@@ -9,11 +9,11 @@ def run_cmd(cmd):
     subprocess.check_call(cmd, shell=True)
 
 def ensure_kaggle_token():
-    # Use the kaggle.json placed in the user's .kaggle directory
-    kaggle_dir = Path('C:/Users/sajal/.kaggle')
+    # Respect Kaggle's standard config path or an explicit environment override.
+    kaggle_dir = Path(os.environ.get('KAGGLE_CONFIG_DIR', Path.home() / '.kaggle'))
     token_path = kaggle_dir / 'kaggle.json'
     if not token_path.is_file():
-        print('Kaggle token not found. Ensure kaggle.json exists in C:/Users/sajal/.kaggle')
+        print(f'Kaggle token not found. Expected {token_path} or set KAGGLE_CONFIG_DIR.')
         sys.exit(1)
     os.environ['KAGGLE_CONFIG_DIR'] = str(kaggle_dir)
 
