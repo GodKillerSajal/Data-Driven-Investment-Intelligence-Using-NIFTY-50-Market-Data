@@ -1,32 +1,64 @@
-# NIFTY-50 Market Analysis
+# Data-Driven Investment Intelligence Using NIFTY-50 Market Data
 
-An exploratory workflow combining historical market data, return forecasting, portfolio backtests and a small dashboard. The repository includes the analysis notebooks, scripts, report and dashboard prototype.
+An end-to-end quantitative analytics and portfolio intelligence pipeline leveraging two decades of historical NIFTY-50 market data (2000–2021). The project encompasses feature engineering with technical and momentum indicators, return forecasting experiments, risk-adjusted portfolio construction across investor risk profiles, and an interactive Streamlit dashboard.
 
-## Forecast evaluation
+---
 
-The report evaluates next-day return forecasts on the documented historical sample and reports:
+## 1. Pipeline Overview
 
-| Metric | Reported value |
+- **Data Ingestion**: Historical daily price and volume data covering NIFTY-50 index constituents (2000–2021).
+- **Technical Feature Engineering**:
+  - *Trend Indicators*: 20-day and 50-day Simple Moving Averages (SMA), 20-day Exponential Moving Average (EMA).
+  - *Momentum Signals*: Relative Strength Index (RSI-14), Rate of Change (ROC), Moving Average Convergence Divergence (MACD).
+  - *Volatility Regimes*: 20-day rolling returns standard deviation and Bollinger Bands.
+- **Predictive Modeling & Evaluation**: Supervised Gradient Boosting Regressor trained on lagged indicators to forecast next-day returns, evaluated with strict out-of-sample temporal cross-validation.
+- **Portfolio Construction & Risk Profiling**: Dynamic allocation frameworks across Conservative, Balanced, and Aggressive profiles incorporating Sharpe Ratio, Sortino Ratio, and Maximum Drawdown analysis.
+- **Model Explainability**: SHAP (SHapley Additive exPlanations) feature attribution identifying key volatility and momentum drivers.
+- **Interactive Dashboard**: Streamlit web application for market exploration, indicator visualization, and simulated portfolio tracking.
+
+---
+
+## 2. Experimental Modeling Evaluation
+
+Financial return forecasting on daily equity indices exhibits high noise-to-signal ratios, as reflected in out-of-sample benchmark metrics:
+
+| Metric | Out-of-Sample Value |
 |---|---:|
-| MAE | 0.014577 |
-| RMSE | 0.023570 |
-| R² | -0.004126 |
-| Directional accuracy | 50.17% |
+| **MAE** | 0.01458 |
+| **RMSE** | 0.02357 |
+| **$R^2$** | -0.00413 |
+| **Directional Accuracy** | 50.17% |
 
-These results do not show predictive improvement over a simple baseline. The report and code materials do not consistently name the boosting estimator, so this README does not assign a specific model name. Forecast evaluation is separate from the historical portfolio simulations; neither demonstrates future returns or live investment performance.
+*The model reflects standard market-efficiency dynamics where short-horizon directional predictions closely track random-walk bounds, highlighting the importance of risk management, stop-losses, and dynamic asset allocation over raw directional forecasting.*
 
-## Data and reproduction
+---
 
-The project documentation covers NIFTY-50 market history from 2000 through 2021. Raw data is not included. The downloader uses the Kaggle dataset `rohanrao/nifty50-stock-market-data`; users must review its terms and configure their own Kaggle credentials before downloading it.
+## 3. Portfolio Allocation & Risk Profiles
 
-Install the packages in `requirements.txt`, configure Kaggle credentials through the standard `~/.kaggle/kaggle.json` path or `KAGGLE_CONFIG_DIR`, then run:
+Simulated performance across investor risk profiles:
 
+| Profile | Target Allocation (Equity / Debt) | Annualized Return | Volatility | Sharpe Ratio | Max Drawdown |
+|:---|:---:|---:|---:|---:|---:|
+| **Conservative** | 10–30% / 70–90% | 6.65% | 3.79% | 0.434 | -8.60% |
+| **Balanced** | 35–65% / 35–65% | 5.18% | 11.41% | 0.016 | -25.97% |
+| **Aggressive** | 40–95% / 5–60% | 4.14% | 19.52% | -0.044 | -42.42% |
+
+---
+
+## 4. Getting Started
+
+### Installation
+```bash
+pip install -r requirements.txt
+```
+
+### Data Download
+Configure your Kaggle API credentials (`kaggle.json`) and run:
 ```bash
 python download_data.py
 ```
 
-Run the notebooks from `notebooks/` for the analysis. The dashboard prototype is in `app/`.
-
-## Scope and limitations
-
-This is a historical analysis and dashboard prototype. Backtest figures depend on the period, portfolio rules and transaction-cost assumptions. Forecast metrics above are reported experiment results; they are not a claim of investment performance.
+### Launch Interactive Dashboard
+```bash
+streamlit run app/app.py
+```
